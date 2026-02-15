@@ -1989,5 +1989,25 @@
         const root = createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
+<script>
+const STORAGE_KEY = "dashboard_content";
+
+function saveContent() {
+  const textarea = document.querySelector("textarea");
+  if (textarea) {
+    localStorage.setItem(STORAGE_KEY, textarea.value);
+  }
+}
+
+function loadContent() {
+  const textarea = document.querySelector("textarea");
+  if (textarea) {
+    textarea.value = localStorage.getItem(STORAGE_KEY) || "";
+  }
+}
+
+window.addEventListener("load", loadContent);
+window.addEventListener("input", saveContent);
+</script>
 </body>
 </html>

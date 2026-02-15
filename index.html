@@ -2097,5 +2097,34 @@ window.addEventListener("input", saveContent);
   mo.observe(document.documentElement, { childList: true, subtree: true });
 })();
 </script>
+    <script>
+(function() {
+  const KEY = "dashboard_full_html";
+
+  function save() {
+    const root = document.getElementById("root");
+    if (root) {
+      localStorage.setItem(KEY, root.innerHTML);
+      console.log("saved");
+    }
+  }
+
+  function load() {
+    const root = document.getElementById("root");
+    const saved = localStorage.getItem(KEY);
+    if (root && saved) {
+      root.innerHTML = saved;
+      console.log("loaded");
+    }
+  }
+
+  window.addEventListener("load", () => {
+    load();
+
+    // שמירה אוטומטית כל 2 שניות
+    setInterval(save, 2000);
+  });
+})();
+</script>
 </body>
 </html>

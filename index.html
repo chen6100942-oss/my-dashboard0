@@ -111,6 +111,20 @@
         };
 
         const App = () => {
+            const loadFromStorage = (key, defaultValue) => {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const saveToStorage = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+};
             const [activeTab, setActiveTab] = useState('home');
             const [showConfetti, setShowConfetti] = useState(false);
 

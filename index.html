@@ -128,7 +128,12 @@ const saveToStorage = (key, value) => {
             const [activeTab, setActiveTab] = useState('home');
             const [showConfetti, setShowConfetti] = useState(false);
 
-            const [dailySchedule, setDailySchedule] = useState([
+            const  [dailySchedule, setDailySchedule] = useState(
+                useEffect(() => {
+  saveToStorage("dailySchedule", dailySchedule);
+}, [dailySchedule]);
+
+                loadFromStorage("dailySchedule", [
                 { id: 's1', time: '05:30–06:00', activity: 'טקס בוקר כולל שתיית מים וקפה', domain: 'גוף ונפש', note: '', type: 'morning', completed: false },
                 { id: 's2', time: '06:30–07:30', activity: 'זמן עם רפאלי – ארוחת בוקר, התארגנות לגן', domain: 'משפחה', note: '', type: 'family', completed: false },
                 { id: 's3', time: '07:30–08:00', activity: 'פעילות גופנית (הליכה/ריצה/כושר)', domain: 'גוף ונפש', note: '', type: 'fitness', completed: false },
@@ -2137,8 +2142,8 @@ window.addEventListener("input", saveContent);
 
     // שמירה אוטומטית כל 2 שניות
     setInterval(save, 2000);
-  });
-})();
+  ])
+);
 </script>
 </body>
 </html>

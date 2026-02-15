@@ -2009,5 +2009,93 @@ function loadContent() {
 window.addEventListener("load", loadContent);
 window.addEventListener("input", saveContent);
 </script>
+    <script>
+(() => {
+  const PREFIX = "persist:";
+  const selectors = 'input[id], input[name], textarea[id], textarea[name], select[id], select[name], [contenteditable="true"][id], [contenteditable="true"][name]';
+
+  function keyFor(el){
+    const id = el.getAttribute("id");
+    const name = el.getAttribute("name");
+    return PREFIX + (id ? ("id:" + id) : ("name:" + name));
+  }
+
+  function getValue(el){
+    if (el.matches('[contenteditable="true"]')) return el.innerHTML;
+    if (el.type === "checkbox") return el.checked ? "1" : "0";
+    if (el.type === "radio") return el.checked ? el.value : "";
+    return el.value ?? "";
+  }
+
+  function setValue(el, val){
+    if (val == null) return;
+
+    if (el.matches('[contenteditable="true"]')) {
+      el.innerHTML = val;
+      return;
+    }
+
+    if (el.type === "checkbox") {
+      el.checked = (val === "1");
+      return;
+    }
+
+    if (el.type === "radio") {
+      el.checked = (val === el.value);
+      return;
+    }
+
+    el.value = val;
+
+    // חשוב ל-React: מודיע לאפליקציה שהערך השתנה
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function restoreAll(){
+    document.querySelectorAll(selectors).forEach(el => {
+      const k = keyFor(el);
+      const saved = localStorage.getItem(k);
+      if (saved !== null) setValue(el, saved);
+    });
+  }
+
+  function saveOne(el){
+    const k = keyFor(el);
+    const v = getValue(el);
+    // לרדיו: נשמור רק אם נבחר
+    if (el.type === "radio" && !el.checked) return;
+    localStorage.setItem(k, v);
+  }
+
+  // שמירה אוטומטית (על כל המסך)
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    if (el && el.matches && el.matches(selectors)) saveOne(el);
+  }, true);
+
+  document.addEventListener("change", (e) => {
+    const el = e.target;
+    if (el && el.matches && el.matches(selectors)) saveOne(el);
+  }, true);
+
+  // שחזור בהתחלה
+  window.addEventListener("load", () => {
+    restoreAll();
+
+    // ל-React: אם האלמנטים נבנים אחרי הטעינה — ננסה שוב כמה פעמים
+    let tries = 0;
+    const timer = setInterval(() => {
+      restoreAll();
+      tries++;
+      if (tries >= 10) clearInterval(timer);
+    }, 600);
+  });
+
+  // וגם אם נוספו אלמנטים חדשים לדף
+  const mo = new MutationObserver(() => restoreAll());
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
 </body>
 </html>
